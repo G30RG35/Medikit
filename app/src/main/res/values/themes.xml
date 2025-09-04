@@ -1,0 +1,12 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MEDIKIT" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#10A37F</item> <!-- Verde tipo OpenAI -->
+        <item name="colorOnPrimary">#FFFFFF</item> <!-- Texto blanco -->
+        <item name="colorSecondary">#E5E5EA</item> <!-- Gris suave para secundarios -->
+
+
+    </style>
+
+    <style name="Theme.MEDIKIT" parent="Base.Theme.MEDIKIT" />
+</resources>
