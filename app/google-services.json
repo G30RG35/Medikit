@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "427934764656",
+    "project_id": "meditalk-d8ad4",
+    "storage_bucket": "meditalk-d8ad4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427934764656:android:428614d64c95bf0dd8aeb5",
+        "android_client_info": {
+          "package_name": "com.example.medikit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXXG-6od1Xnnsr7mtsd8SDHVYjhIuAjvE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "2"
+}

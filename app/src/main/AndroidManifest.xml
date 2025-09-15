@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MEDIKIT">
         <activity
+            android:name=".Login"
+            android:exported="false" />
+        <activity
             android:name=".Home"
             android:exported="false" />
         <activity
@@ -27,12 +30,10 @@
         <activity
             android:name=".Registro"
             android:exported="false" />
-
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:theme="@style/Theme.MEDIKIT">
-        </activity>
+            android:theme="@style/Theme.MEDIKIT"></activity>
     </application>
 
 </manifest>

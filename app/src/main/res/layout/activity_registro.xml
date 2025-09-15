@@ -24,13 +24,13 @@
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/ic_medical"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/logo1" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MEDIKIT"
+                android:text="MEDITALK"
                 android:textColor="#2A6FB5"
                 android:textSize="28sp"
                 android:textStyle="bold"
@@ -54,51 +54,41 @@
             android:background="@drawable/rounded_white_bg"
             android:elevation="2dp">
 
-            <!-- Campos de nombre en fila -->
-            <LinearLayout
+            <!-- Campo Nombres (ahora individual) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/nameLayout"
+                style="@style/CompactTextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
 
-                <!-- Campo Nombres -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/nameLayout"
-                    style="@style/CompactTextInputLayout"
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextText2"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp">
+                    android:hint="Nombres"
+                    android:inputType="textCapWords"
+                    android:maxLines="1"
+                    style="@style/CompactEditText"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/editTextText2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Nombres"
-                        android:inputType="textCapWords"
-                        android:maxLines="1"
-                        style="@style/CompactEditText"/>
-                </com.google.android.material.textfield.TextInputLayout>
+            <!-- Campo Apellido Paterno (ahora individual) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/lastName1Layout"
+                style="@style/CompactTextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
 
-                <!-- Campo Apellido Paterno -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/lastName1Layout"
-                    style="@style/CompactTextInputLayout"
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextText3"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/editTextText3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Apellido Paterno"
-                        android:inputType="textCapWords"
-                        android:maxLines="1"
-                        style="@style/CompactEditText"/>
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
+                    android:hint="Apellido Paterno"
+                    android:inputType="textCapWords"
+                    android:maxLines="1"
+                    style="@style/CompactEditText"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Campo Apellido Materno -->
             <com.google.android.material.textfield.TextInputLayout
@@ -177,7 +167,7 @@
                         android:id="@+id/editTextTextPassword2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Confirmar"
+                        android:hint="Confirmar contraseña"
                         android:inputType="textPassword"
                         android:maxLines="1"
                         style="@style/CompactEditText"/>
@@ -202,6 +192,14 @@
                 android:backgroundTint="#2A6FB5"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:visibility="gone" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -229,6 +227,7 @@
                 android:textColor="#666666"/>
 
             <TextView
+                android:id="@+id/textViewLoginLink"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Iniciar Sesión"

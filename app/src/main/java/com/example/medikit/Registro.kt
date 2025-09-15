@@ -4,13 +4,20 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Patterns
+import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.regex.Pattern
-
 class Registro : AppCompatActivity() {
+
 
     private lateinit var nameLayout: TextInputLayout
     private lateinit var lastName1Layout: TextInputLayout
@@ -19,17 +26,20 @@ class Registro : AppCompatActivity() {
     private lateinit var passwordLayout: TextInputLayout
     private lateinit var confirmPasswordLayout: TextInputLayout
 
-    // LÍNEA CORREGIDA:
     private lateinit var nameEditText: TextInputEditText
     private lateinit var lastName1EditText: TextInputEditText
-    // FIN DE LA CORRECCIÓN
-
     private lateinit var lastName2EditText: TextInputEditText
     private lateinit var emailEditText: TextInputEditText
     private lateinit var passwordEditText: TextInputEditText
     private lateinit var confirmPasswordEditText: TextInputEditText
+    private lateinit var checkBox: CheckBox
 
     private lateinit var btnRegistrarse: Button
+    private lateinit var progressBar: ProgressBar
+
+    // Firebase (versión sin KTX)
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     // Flags para saber si el usuario ha interactuado con un campo
     private var nameTouched = false
@@ -38,7 +48,6 @@ class Registro : AppCompatActivity() {
     private var emailTouched = false
     private var passwordTouched = false
     private var confirmPasswordTouched = false
-
 
     companion object {
         private val PASSWORD_PATTERN =
@@ -49,16 +58,15 @@ class Registro : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registro)
 
+        // Inicializar Firebase (versión sin KTX)
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+
         initializeViews()
-        setupFieldFocusListeners() // Para marcar campos como "tocados"
-        setupTextWatchers() // Para validación y habilitación del botón
+        setupFieldFocusListeners()
+        setupTextWatchers()
 
-        // Inicialmente el botón de registrarse estará deshabilitado
-        // y se habilitará a medida que los campos se llenen correctamente.
-        // O puedes dejarlo habilitado y solo validar al hacer clic.
-        // Por ahora, lo dejaremos deshabilitado y se habilitará con la validación.
         btnRegistrarse.isEnabled = false
-
 
         btnRegistrarse.setOnClickListener {
             // Marcar todos los campos como "tocados" para que muestren error si es necesario
@@ -73,9 +81,7 @@ class Registro : AppCompatActivity() {
                 performRegistration()
             }
         }
-        // NO llamar a validateAllFields() aquí para evitar errores iniciales
     }
-
     private fun initializeViews() {
         nameLayout = findViewById(R.id.nameLayout)
         lastName1Layout = findViewById(R.id.lastName1Layout)
@@ -90,18 +96,20 @@ class Registro : AppCompatActivity() {
         emailEditText = findViewById(R.id.editTextTextEmailAddress)
         passwordEditText = findViewById(R.id.editTextTextPassword)
         confirmPasswordEditText = findViewById(R.id.editTextTextPassword2)
+        checkBox = findViewById(R.id.checkBox)
 
         btnRegistrarse = findViewById(R.id.btnRegistrarse)
+        progressBar = findViewById(R.id.progressBar)
     }
 
     private fun setupFieldFocusListeners() {
         nameEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus && !nameTouched) { // Si pierde el foco y no había sido tocado antes
+            if (!hasFocus && !nameTouched) {
                 nameTouched = true
-                validateName(true) // Validar y mostrar error si es necesario
+                validateName(true)
                 checkAllFieldsValidForButtonState()
             } else if (hasFocus) {
-                nameLayout.error = null // Limpiar error al ganar foco si se desea
+                nameLayout.error = null
             }
         }
         lastName1EditText.setOnFocusChangeListener { _, hasFocus ->
@@ -135,7 +143,7 @@ class Registro : AppCompatActivity() {
             if (!hasFocus && !passwordTouched) {
                 passwordTouched = true
                 validatePassword(true)
-                validateConfirmPassword(confirmPasswordTouched) // Revalidar confirmación si la contraseña cambia
+                validateConfirmPassword(confirmPasswordTouched)
                 checkAllFieldsValidForButtonState()
             } else if (hasFocus) {
                 passwordLayout.error = null
@@ -152,13 +160,11 @@ class Registro : AppCompatActivity() {
         }
     }
 
-
     private fun setupTextWatchers() {
         val commonTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                // Valida el campo actual si ha sido "tocado"
                 when {
                     nameEditText.hasFocus() && nameTouched -> validateName(true)
                     lastName1EditText.hasFocus() && lastName1Touched -> validateLastName1(true)
@@ -166,7 +172,7 @@ class Registro : AppCompatActivity() {
                     emailEditText.hasFocus() && emailTouched -> validateEmail(true)
                     passwordEditText.hasFocus() && passwordTouched -> {
                         validatePassword(true)
-                        validateConfirmPassword(confirmPasswordTouched) // Revalidar si la confirmación ya fue tocada
+                        validateConfirmPassword(confirmPasswordTouched)
                     }
                     confirmPasswordEditText.hasFocus() && confirmPasswordTouched -> validateConfirmPassword(true)
                 }
@@ -182,12 +188,7 @@ class Registro : AppCompatActivity() {
         confirmPasswordEditText.addTextChangedListener(commonTextWatcher)
     }
 
-    /**
-     * Valida todos los campos y MUESTRA errores si es necesario.
-     * Se usa principalmente al hacer clic en el botón de registrar.
-     */
     private fun validateAllFieldsAndShowErrors(): Boolean {
-        // Llamamos a cada validador individual con showErrors = true
         val nameValid = validateName(true)
         val lastName1Valid = validateLastName1(true)
         val lastName2Valid = validateLastName2(true)
@@ -195,21 +196,12 @@ class Registro : AppCompatActivity() {
         val passwordValid = validatePassword(true)
         val confirmPasswordValid = validateConfirmPassword(true)
 
-        val allValid = nameValid && lastName1Valid && lastName2Valid &&
+        return nameValid && lastName1Valid && lastName2Valid &&
                 emailValid && passwordValid && confirmPasswordValid
-
-        // El estado del botón ya se maneja en checkAllFieldsValidForButtonState
-        // pero podemos asegurarlo aquí también si es necesario, aunque es redundante.
-        // btnRegistrarse.isEnabled = allValid
-        return allValid
     }
 
-    /**
-     * Verifica si todos los campos son válidos (sin mostrar errores)
-     * y actualiza el estado del botón de registrarse.
-     */
     private fun checkAllFieldsValidForButtonState() {
-        val nameValid = validateName(false) // No mostrar error, solo obtener validez
+        val nameValid = validateName(false)
         val lastName1Valid = validateLastName1(false)
         val lastName2Valid = validateLastName2(false)
         val emailValid = validateEmail(false)
@@ -220,16 +212,12 @@ class Registro : AppCompatActivity() {
                 emailValid && passwordValid && confirmPasswordValid
     }
 
-
-    // --- Métodos de Validación Individual ---
-    // Modificados para aceptar un parámetro 'showError'
-
     private fun validateName(showError: Boolean): Boolean {
         val name = nameEditText.text.toString().trim()
         val isValid = name.isNotEmpty()
-        if (showError && nameTouched) { // Solo mostrar error si el campo ha sido "tocado"
+        if (showError && nameTouched) {
             nameLayout.error = if (!isValid) "El nombre es obligatorio" else null
-        } else if (!showError) { // Si no se debe mostrar error, pero queremos limpiar uno previo si ahora es válido
+        } else if (!showError) {
             if (isValid && nameLayout.error != null) nameLayout.error = null
         }
         return isValid
@@ -265,7 +253,7 @@ class Registro : AppCompatActivity() {
         if (showError && emailTouched) {
             emailLayout.error = when {
                 !isNotEmpty -> "El correo electrónico es obligatorio"
-                !isValidFormat -> "Ingresa un correo electrónico válido (debe contener @ y dominio)"
+                !isValidFormat -> "Ingresa un correo electrónico válido"
                 else -> null
             }
         } else if (!showError) {
@@ -282,7 +270,7 @@ class Registro : AppCompatActivity() {
         if (showError && passwordTouched) {
             passwordLayout.error = when {
                 !isNotEmpty -> "La contraseña es obligatoria"
-                !isValidPattern -> "La contraseña debe tener al menos 8 caracteres, incluir letras, números y símbolos básicos (@$!%*#?&)"
+                !isValidPattern -> "La contraseña debe tener al menos 8 caracteres, incluir letras, números y símbolos"
                 else -> null
             }
         } else if (!showError) {
@@ -310,6 +298,100 @@ class Registro : AppCompatActivity() {
     }
 
     private fun performRegistration() {
-        // Lógica de registro
+        val nombre = nameEditText.text.toString().trim()
+        val apellidoPaterno = lastName1EditText.text.toString().trim()
+        val apellidoMaterno = lastName2EditText.text.toString().trim()
+        val email = emailEditText.text.toString().trim()
+        val password = passwordEditText.text.toString().trim()
+        val rememberMe = checkBox.isChecked
+
+        showLoading(true)
+
+        // Crear usuario en Firebase Authentication
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    user?.let {
+                        // Actualizar perfil con nombre completo
+                        val profileUpdates = UserProfileChangeRequest.Builder()
+                            .setDisplayName("$nombre $apellidoPaterno $apellidoMaterno")
+                            .build()
+
+                        it.updateProfile(profileUpdates)
+                            .addOnCompleteListener { profileTask ->
+                                if (profileTask.isSuccessful) {
+                                    // Guardar usuario en Firestore
+                                    saveUserToFirestore(it.uid, nombre, apellidoPaterno, apellidoMaterno, email, rememberMe)
+                                } else {
+                                    showLoading(false)
+                                    Toast.makeText(
+                                        this,
+                                        "Error al actualizar perfil: ${profileTask.exception?.message}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                    }
+                } else {
+                    showLoading(false)
+                    Toast.makeText(
+                        this,
+                        "Error en registro: ${task.exception?.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+    }
+    private fun saveUserToFirestore(
+        userId: String,
+        nombre: String,
+        apellidoPaterno: String,
+        apellidoMaterno: String,
+        email: String,
+        rememberMe: Boolean
+    ) {
+        val user = hashMapOf(
+            "userId" to userId,
+            "nombre" to nombre,
+            "apellidoPaterno" to apellidoPaterno,
+            "apellidoMaterno" to apellidoMaterno,
+            "email" to email,
+            "rememberMe" to rememberMe,
+            "fechaRegistro" to System.currentTimeMillis(),
+            "ultimoAcceso" to System.currentTimeMillis(),
+            "activo" to true
+        )
+
+        db.collection("usuarios")
+            .document(userId)
+            .set(user)
+            .addOnSuccessListener {
+                showLoading(false)
+                Toast.makeText(this, "¡Registro exitoso!", Toast.LENGTH_SHORT).show()
+                // Aquí puedes redirigir a la siguiente actividad
+                // startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+            .addOnFailureListener { e ->
+                showLoading(false)
+                Toast.makeText(
+                    this,
+                    "Error al guardar datos: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+    }
+
+    private fun showLoading(loading: Boolean) {
+        if (loading) {
+            progressBar.visibility = View.VISIBLE
+            btnRegistrarse.isEnabled = false
+            btnRegistrarse.text = "Registrando..."
+        } else {
+            progressBar.visibility = View.GONE
+            btnRegistrarse.isEnabled = true
+            btnRegistrarse.text = "Registrarse"
+        }
     }
 }
