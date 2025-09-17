@@ -196,16 +196,15 @@ class Login : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Inicio de sesión exitoso
                     Toast.makeText(baseContext, "Inicio de sesión exitoso.", Toast.LENGTH_SHORT).show()
-                    // Navegar a la pantalla principal o dashboard
-                    // val intent = Intent(this, MainActivity::class.java)
-                    // startActivity(intent)
-                    // finish() // Cierra LoginActivity para que el usuario no pueda volver con el botón "Atrás"
+                    val intent = Intent(this, Home::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish() // Cierra LoginActivity para que el usuario no pueda volver con el botón "Atrás"
                 } else {
                     // Si el inicio de sesión falla, mostrar un mensaje al usuario.
-                    Toast.makeText(baseContext, "Error de autenticación: ${task.exception?.message}",
-                        Toast.LENGTH_LONG).show()
-                    // Podrías mostrar un error más específico en loginPasswordLayout o loginEmailLayout
-                    loginPasswordLayout.error = "Correo o contraseña incorrectos"
+                    val errorMsg = task.exception?.localizedMessage ?: "Error de autenticación"
+                    Toast.makeText(baseContext, errorMsg, Toast.LENGTH_LONG).show()
+                    loginPasswordLayout.error = errorMsg
                 }
             }
         // --- Fin de la Lógica de Inicio de Sesión (Ejemplo) ---

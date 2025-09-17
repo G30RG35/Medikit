@@ -1,17 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
     tools:context=".Home">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+    <!-- Encabezado con logo y título -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Este es el hom de la aplicacion"
-        tools:layout_editor_absoluteX="109dp"
-        tools:layout_editor_absoluteY="356dp" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="40dp">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/logo1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MEDITALK"
+            android:textColor="#2A6FB5"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bienvenido a tu panel principal"
+            android:textColor="#666666"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+    <!-- Tarjeta con botones principales -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="@drawable/rounded_white_bg"
+        android:elevation="2dp">
+
+        <Button
+            android:id="@+id/btnCaptura"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Hacer Captura"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:textColor="#2A6FB5"
+            android:textSize="14sp"
+            app:strokeColor="#2A6FB5"
+            app:strokeWidth="1dp"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btnHistorial"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Ver mi Historial"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:textColor="#2A6FB5"
+            android:textSize="14sp"
+            app:strokeColor="#2A6FB5"
+            app:strokeWidth="1dp"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btnPerfil"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Ver mi Perfil"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:textColor="#2A6FB5"
+            android:textSize="14sp"
+            app:strokeColor="#2A6FB5"
+            app:strokeWidth="1dp"/>
+
+    </LinearLayout>
+
+    <!-- Texto inferior -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="© 2025 Medikit - Todos los derechos reservados"
+        android:textColor="#999999"
+        android:textSize="10sp"
+        android:gravity="center"
+        android:layout_marginTop="24dp"/>
+
+</LinearLayout>

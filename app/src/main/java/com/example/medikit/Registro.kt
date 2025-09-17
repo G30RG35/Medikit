@@ -1,6 +1,7 @@
 package com.example.medikit
 
 import android.os.Bundle
+import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Patterns
@@ -369,8 +370,10 @@ class Registro : AppCompatActivity() {
             .addOnSuccessListener {
                 showLoading(false)
                 Toast.makeText(this, "¡Registro exitoso!", Toast.LENGTH_SHORT).show()
-                // Aquí puedes redirigir a la siguiente actividad
-                // startActivity(Intent(this, MainActivity::class.java))
+                // El usuario ya está autenticado, simplemente ir a Home
+                val intent = Intent(this, Home::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
                 finish()
             }
             .addOnFailureListener { e ->
