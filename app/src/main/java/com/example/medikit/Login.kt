@@ -68,9 +68,25 @@ class Login : AppCompatActivity() {
         }
 
         textViewForgotPassword.setOnClickListener {
-            // Lógica para "Olvidé mi contraseña"
-            // Por ejemplo, mostrar un diálogo o navegar a otra pantalla
-            Toast.makeText(this, "Funcionalidad 'Olvidé contraseña' no implementada", Toast.LENGTH_SHORT).show()
+            val email = loginEditTextEmailAddress.text.toString().trim()
+            if (email.isEmpty()) {
+                loginEmailLayout.error = "Ingresa tu correo para recuperar la contraseña"
+                loginEditTextEmailAddress.requestFocus()
+            } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                loginEmailLayout.error = "Correo inválido"
+                loginEditTextEmailAddress.requestFocus()
+            } else {
+                loginEmailLayout.error = null
+                auth.sendPasswordResetEmail(email)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(this, "Se envió un correo para restablecer tu contraseña", Toast.LENGTH_LONG).show()
+                        } else {
+                            val errorMsg = task.exception?.localizedMessage ?: "Error al enviar correo de recuperación"
+                            Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show()
+                        }
+                    }
+            }
         }
     }
 
