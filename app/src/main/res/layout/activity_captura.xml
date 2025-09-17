@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    tools:context=".CapturaActivity">
+
+    <!-- Encabezado con logo y título -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="40dp">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/logo1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MEDITALK"
+            android:textColor="#2A6FB5"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tomar Foto"
+            android:textColor="#666666"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"/>
+    </LinearLayout>
+
+    <!-- Vista previa de la foto -->
+    <ImageView
+        android:id="@+id/ivPreview"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:background="#EEEEEE"
+        android:src="@drawable/baseline_camera_alt_24"/>
+
+    <!-- Botón para tomar foto -->
+    <Button
+        android:id="@+id/btnTomarFoto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tomar Foto"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:textColor="#2A6FB5"
+        android:textSize="16sp"
+        app:strokeColor="#2A6FB5"
+        app:strokeWidth="1dp"
+        android:layout_marginTop="24dp"/>
+
+    <!-- Texto inferior -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="© 2025 Medikit - Todos los derechos reservados"
+        android:textColor="#999999"
+        android:textSize="10sp"
+        android:gravity="center"
+        android:layout_marginTop="24dp"/>
+
+</LinearLayout>

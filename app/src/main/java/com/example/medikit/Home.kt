@@ -17,5 +17,11 @@ class Home : AppCompatActivity() {
             val intent = android.content.Intent(this, PerfilActivity::class.java)
             startActivity(intent)
         }
+
+        val btnCaptura = findViewById<android.widget.Button>(R.id.btnCaptura)
+        btnCaptura.setOnClickListener {
+            val intent = android.content.Intent(this, CapturaActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
