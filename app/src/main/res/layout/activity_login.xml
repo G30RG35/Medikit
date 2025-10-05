@@ -71,7 +71,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Correo electrónico"
                 android:inputType="textEmailAddress"
-                android:maxLines="1"/>
+                android:maxLines="1"
+                android:textColor="#000000"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Campo Contraseña -->
@@ -90,7 +91,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Contraseña"
                 android:inputType="textPassword"
-                android:maxLines="1"/>
+                android:maxLines="1"
+                android:textColor="#000000"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <CheckBox

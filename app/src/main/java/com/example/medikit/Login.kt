@@ -18,38 +18,31 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 
 class Login : AppCompatActivity() {
-
     private lateinit var loginEmailLayout: TextInputLayout
     private lateinit var loginPasswordLayout: TextInputLayout
-
     private lateinit var loginEditTextEmailAddress: TextInputEditText
     private lateinit var loginEditTextPassword: TextInputEditText
     private lateinit var loginCheckBoxRememberMe: CheckBox
-
     private lateinit var btnLogin: Button
     private lateinit var loginProgressBar: ProgressBar
     private lateinit var textViewForgotPassword: TextView
     private lateinit var textViewRegisterLink: TextView
 
-    // Flags para interacción del usuario (similar a Registro.kt)
     private var emailTouched = false
     private var passwordTouched = false
 
-    // Firebase Auth (opcional, si lo usas)
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login) // Asegúrate que este es tu layout XML de login
+        setContentView(R.layout.activity_login)
 
-        // Inicializar Firebase Auth (opcional)
         auth = FirebaseAuth.getInstance()
 
         initializeViews()
         setupFieldFocusListeners()
         setupTextWatchers()
 
-        // Botón de login inicialmente deshabilitado
         btnLogin.isEnabled = false
 
         btnLogin.setOnClickListener {
@@ -62,8 +55,7 @@ class Login : AppCompatActivity() {
         }
 
         textViewRegisterLink.setOnClickListener {
-            // Navegar a la actividad de Registro
-            val intent = Intent(this, Registro::class.java) // Asumiendo que tu Activity de registro se llama Registro
+            val intent = Intent(this, Registro::class.java)
             startActivity(intent)
         }
 
@@ -177,22 +169,15 @@ class Login : AppCompatActivity() {
     private fun validatePassword(showError: Boolean): Boolean {
         val password = loginEditTextPassword.text.toString().trim()
         val isNotEmpty = password.isNotEmpty()
-        // Para el login, usualmente no se valida el formato de la contraseña aquí,
-        // solo que no esté vacío. El servidor se encarga de la validez de la contraseña.
-        // Si quieres una validación de longitud mínima en el cliente:
-        // val isLongEnough = password.length >= 8
 
         if (showError && passwordTouched) {
             loginPasswordLayout.error = when {
                 !isNotEmpty -> "La contraseña es obligatoria"
-                // !isLongEnough -> "La contraseña debe tener al menos 8 caracteres" // Ejemplo
                 else -> null
             }
         } else if (!showError) {
-            // if (isNotEmpty && isLongEnough && loginPasswordLayout.error != null) loginPasswordLayout.error = null // Ejemplo
             if (isNotEmpty && loginPasswordLayout.error != null) loginPasswordLayout.error = null
         }
-        // return isNotEmpty && isLongEnough // Ejemplo
         return isNotEmpty
     }
 
@@ -201,49 +186,25 @@ class Login : AppCompatActivity() {
         val password = loginEditTextPassword.text.toString().trim()
 
         loginProgressBar.visibility = View.VISIBLE
-        btnLogin.isEnabled = false // Deshabilitar botón durante el proceso
+        btnLogin.isEnabled = false
 
-        // --- Lógica de Inicio de Sesión (Ejemplo con Firebase Auth) ---
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 loginProgressBar.visibility = View.GONE
-                btnLogin.isEnabled = true // Rehabilitar botón
+                btnLogin.isEnabled = true
 
                 if (task.isSuccessful) {
-                    // Inicio de sesión exitoso
                     Toast.makeText(baseContext, "Inicio de sesión exitoso.", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, Home::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
-                    finish() // Cierra LoginActivity para que el usuario no pueda volver con el botón "Atrás"
+                    finish()
                 } else {
-                    // Si el inicio de sesión falla, mostrar un mensaje al usuario.
                     val errorMsg = task.exception?.localizedMessage ?: "Error de autenticación"
                     Toast.makeText(baseContext, errorMsg, Toast.LENGTH_LONG).show()
                     loginPasswordLayout.error = errorMsg
                 }
             }
-        // --- Fin de la Lógica de Inicio de Sesión (Ejemplo) ---
-
-        // Si no usas Firebase, aquí iría tu propia lógica de autenticación
-        // (ej. llamar a tu API, verificar en una base de datos local, etc.)
-        // Si es solo un prototipo sin backend:
-        /*
-        Handler(Looper.getMainLooper()).postDelayed({
-            loginProgressBar.visibility = View.GONE
-            btnLogin.isEnabled = true
-            if (email == "test@example.com" && password == "password123") {
-                Toast.makeText(this, "Login Exitoso (Simulado)", Toast.LENGTH_SHORT).show()
-                // Navegar a la siguiente pantalla
-                // val intent = Intent(this, MainActivity::class.java)
-                // startActivity(intent)
-                // finish()
-            } else {
-                Toast.makeText(this, "Credenciales incorrectas (Simulado)", Toast.LENGTH_SHORT).show()
-                loginPasswordLayout.error = "Correo o contraseña incorrectos"
-            }
-        }, 2000) // Simular retraso de red
-        */
     }
 }
 
