@@ -66,6 +66,19 @@
         app:strokeWidth="1dp"
         android:layout_marginTop="24dp"/>
 
+    <!-- Botón para seleccionar de galería -->
+    <Button
+        android:id="@+id/btnGaleria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar de galería"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:textColor="#2A6FB5"
+        android:textSize="16sp"
+        app:strokeColor="#2A6FB5"
+        app:strokeWidth="1dp"
+        android:layout_marginTop="12dp"/>
+
     <!-- Texto inferior -->
     <TextView
         android:layout_width="match_parent"

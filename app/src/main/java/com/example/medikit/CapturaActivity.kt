@@ -10,13 +10,18 @@ import android.provider.MediaStore
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import android.util.Log
 import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
 class CapturaActivity : AppCompatActivity() {
     private lateinit var ivPreview: ImageView
     private lateinit var btnTomarFoto: Button
+    private lateinit var btnGaleria: Button
     private var photoUri: Uri? = null
     private var photoFile: File? = null
 
@@ -26,22 +31,22 @@ class CapturaActivity : AppCompatActivity() {
 
         ivPreview = findViewById(R.id.ivPreview)
         btnTomarFoto = findViewById(R.id.btnTomarFoto)
+        btnGaleria = findViewById(R.id.btnGaleria)
 
-        btnTomarFoto.isEnabled = false
-        checkCameraPermissionAndOpenCamera()
+        // El botón de captura ahora abre un selector para elegir cámara o galería
+        btnTomarFoto.isEnabled = true
+        btnTomarFoto.setOnClickListener { mostrarSelectorFuente() }
 
-        btnTomarFoto.setOnClickListener {
-            // No hacer nada, la cámara ya se abre automáticamente
+        btnGaleria.setOnClickListener {
+            abrirGaleria()
         }
     }
 
     private fun checkCameraPermissionAndOpenCamera() {
         if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
             == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            android.widget.Toast.makeText(this, "Permiso de cámara concedido", android.widget.Toast.LENGTH_SHORT).show()
             dispatchTakePictureIntent()
         } else {
-            android.widget.Toast.makeText(this, "Solicitando permiso de cámara", android.widget.Toast.LENGTH_SHORT).show()
             androidx.core.app.ActivityCompat.requestPermissions(
                 this,
                 arrayOf(android.Manifest.permission.CAMERA),
@@ -57,7 +62,7 @@ class CapturaActivity : AppCompatActivity() {
                 dispatchTakePictureIntent()
             } else {
                 btnTomarFoto.isEnabled = true
-                android.widget.Toast.makeText(this, "Permiso de cámara denegado", android.widget.Toast.LENGTH_LONG).show()
+                Log.w("CapturaActivity", "Permiso de cámara denegado")
             }
         }
     }
@@ -74,12 +79,39 @@ class CapturaActivity : AppCompatActivity() {
                 )
                 photoUri = uri
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-                android.widget.Toast.makeText(this, "Lanzando intent de cámara", android.widget.Toast.LENGTH_SHORT).show()
                 startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
             }
         } else {
-            android.widget.Toast.makeText(this, "No se encontró app de cámara", android.widget.Toast.LENGTH_LONG).show()
+            Log.e("CapturaActivity", "No se encontró app de cámara")
         }
+    }
+
+    private fun mostrarSelectorFuente() {
+        val dialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_fuente_imagen, null)
+        dialog.setContentView(view)
+
+        val btnCamara = view.findViewById<Button>(R.id.btnSheetCamera)
+        val btnGaleria = view.findViewById<Button>(R.id.btnSheetGallery)
+
+        btnCamara.setOnClickListener {
+            dialog.dismiss()
+            checkCameraPermissionAndOpenCamera()
+        }
+        btnGaleria.setOnClickListener {
+            dialog.dismiss()
+            abrirGaleria()
+        }
+
+        dialog.show()
+    }
+
+    private fun abrirGaleria() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+        }
+        startActivityForResult(intent, REQUEST_GALLERY_PICK)
     }
 
     private fun createImageFile(): File? {
@@ -97,24 +129,85 @@ class CapturaActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            android.widget.Toast.makeText(this, "Foto tomada correctamente", android.widget.Toast.LENGTH_SHORT).show()
             photoFile?.let {
                 val bitmap = BitmapFactory.decodeFile(it.absolutePath)
                 ivPreview.setImageBitmap(bitmap)
-                // Ir a pantalla de éxito
+                
+                // Guardar la ruta de la imagen
+                ImagenGlobal.rutaImagen = it.absolutePath
+                
+                // Mostrar pantalla de éxito temporalmente
                 val intent = Intent(this, FotoExitoActivity::class.java)
                 startActivity(intent)
                 finish()
             }
+        } else if (requestCode == REQUEST_GALLERY_PICK && resultCode == Activity.RESULT_OK) {
+            val uri = data?.data
+            if (uri != null) {
+                // Conservar permiso de lectura para el URI
+                try {
+                    contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                } catch (_: Exception) { /* puede fallar si no es persistible, ignorable */ }
+
+                // Copiar contenido a almacenamiento de la app
+                val destino = createImageFileFromGallery()
+                if (destino != null) {
+                    try {
+                        contentResolver.openInputStream(uri)?.use { input ->
+                            FileOutputStream(destino).use { output ->
+                                val buffer = ByteArray(8 * 1024)
+                                var bytesRead = input.read(buffer)
+                                while (bytesRead != -1) {
+                                    output.write(buffer, 0, bytesRead)
+                                    bytesRead = input.read(buffer)
+                                }
+                                output.flush()
+                            }
+                        }
+
+                        // Mostrar preview y continuar flujo
+                        val bitmap = BitmapFactory.decodeFile(destino.absolutePath)
+                        ivPreview.setImageBitmap(bitmap)
+
+                        ImagenGlobal.rutaImagen = destino.absolutePath
+
+                        val intent = Intent(this, FotoExitoActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } catch (e: Exception) {
+                        Log.e("CapturaActivity", "Error al importar imagen", e)
+                    }
+                } else {
+                    Log.e("CapturaActivity", "No se pudo crear archivo de destino")
+                }
+            } else {
+                Log.w("CapturaActivity", "No se seleccionó imagen")
+            }
         } else {
-            android.widget.Toast.makeText(this, "No se tomó la foto o se canceló", android.widget.Toast.LENGTH_SHORT).show()
+            Log.i("CapturaActivity", "Operación cancelada o sin resultado")
             // Si el usuario cancela, habilitar el botón para intentar de nuevo
             btnTomarFoto.isEnabled = true
+        }
+    }
+
+    private fun createImageFileFromGallery(): File? {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return try {
+            File.createTempFile(
+                "GALLERY_${'$'}timeStamp_", ".jpg", storageDir
+            )
+        } catch (ex: Exception) {
+            null
         }
     }
 
     companion object {
         private const val REQUEST_IMAGE_CAPTURE = 1
         private const val REQUEST_CAMERA_PERMISSION = 2
+        private const val REQUEST_GALLERY_PICK = 3
     }
 }
