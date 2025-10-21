@@ -43,6 +43,14 @@ class Login : AppCompatActivity() {
         setupFieldFocusListeners()
         setupTextWatchers()
 
+        // Recuperar email guardado si existe
+        val prefs = getSharedPreferences("loginPrefs", MODE_PRIVATE)
+        val savedEmail = prefs.getString("email", "")
+        if (!savedEmail.isNullOrEmpty()) {
+            loginEditTextEmailAddress.setText(savedEmail)
+            loginCheckBoxRememberMe.isChecked = true
+        }
+
         btnLogin.isEnabled = false
 
         btnLogin.setOnClickListener {
@@ -195,6 +203,13 @@ class Login : AppCompatActivity() {
 
                 if (task.isSuccessful) {
                     Toast.makeText(baseContext, "Inicio de sesión exitoso.", Toast.LENGTH_SHORT).show()
+                    // Guardar email si el checkbox está marcado
+                    val prefs = getSharedPreferences("loginPrefs", MODE_PRIVATE)
+                    if (loginCheckBoxRememberMe.isChecked) {
+                        prefs.edit().putString("email", email).apply()
+                    } else {
+                        prefs.edit().remove("email").apply()
+                    }
                     val intent = Intent(this, Home::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)

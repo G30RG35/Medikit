@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 
 class FotoExitoActivity : AppCompatActivity() {
@@ -14,7 +14,6 @@ class FotoExitoActivity : AppCompatActivity() {
 
         val ruta = ImagenGlobal.rutaImagen
         if (ruta != null) {
-            Toast.makeText(this, "Analizando imagen con IA...", Toast.LENGTH_SHORT).show()
             
             // Ejecutar análisis en segundo plano
             Thread {
@@ -25,7 +24,17 @@ class FotoExitoActivity : AppCompatActivity() {
                     runOnUiThread {
                         if (resultado != null) {
                             ImagenGlobal.resultadoIA = resultado
-                            Toast.makeText(this, "Análisis completado", Toast.LENGTH_SHORT).show()
+                            // Persistir resultado localmente
+                            try {
+                                val registro = AnalisisStorage.crearRegistro(
+                                    rutaImagen = ruta,
+                                    clase = resultado.clase,
+                                    confianza = resultado.confianza
+                                )
+                                AnalisisStorage.append(this, registro)
+                            } catch (e: Exception) {
+                                Log.e("FotoExitoActivity", "Error guardando análisis", e)
+                            }
                             
                             // Esperar un momento y luego ir a resultados
                             Handler(Looper.getMainLooper()).postDelayed({
@@ -34,7 +43,7 @@ class FotoExitoActivity : AppCompatActivity() {
                                 finish()
                             }, 1500)
                         } else {
-                            Toast.makeText(this, "Error en el análisis", Toast.LENGTH_LONG).show()
+                            Log.e("FotoExitoActivity", "Error en el análisis: resultado nulo")
                             // En caso de error, volver al home
                             Handler(Looper.getMainLooper()).postDelayed({
                                 val intent = Intent(this, Home::class.java)
@@ -45,7 +54,7 @@ class FotoExitoActivity : AppCompatActivity() {
                     }
                 } catch (e: Exception) {
                     runOnUiThread {
-                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                        Log.e("FotoExitoActivity", "Error en análisis", e)
                         Handler(Looper.getMainLooper()).postDelayed({
                             val intent = Intent(this, Home::class.java)
                             startActivity(intent)
@@ -56,7 +65,7 @@ class FotoExitoActivity : AppCompatActivity() {
             }.start()
             
         } else {
-            Toast.makeText(this, "No se encontró la imagen tomada", Toast.LENGTH_LONG).show()
+            Log.e("FotoExitoActivity", "No se encontró la imagen tomada")
             val intent = Intent(this, Home::class.java)
             startActivity(intent)
             finish()

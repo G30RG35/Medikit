@@ -52,30 +52,60 @@
         android:background="@drawable/rounded_white_bg"
         android:elevation="2dp">
 
-        <TextView
-            android:id="@+id/tvNombre"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nombre: "
-            android:textSize="18sp"
-            android:textColor="#333"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            app:boxBackgroundMode="outline">
 
-        <TextView
-            android:id="@+id/tvApellidos"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nombre"
+                android:textSize="16sp"
+                android:textColor="#333"
+                android:enabled="false"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Apellidos: "
-            android:textSize="18sp"
-            android:textColor="#333"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            app:boxBackgroundMode="outline">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etApellidoPaterno"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Apellido Paterno"
+                android:textSize="16sp"
+                android:textColor="#333"
+                android:enabled="false"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:boxBackgroundMode="outline">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etApellidoMaterno"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Apellido Materno"
+                android:textSize="16sp"
+                android:textColor="#333"
+                android:enabled="false"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/tvEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Email: "
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textColor="#333"
             android:layout_marginBottom="12dp"/>
 
@@ -84,9 +114,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Fecha de registro: "
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="#666"
             android:layout_marginBottom="12dp"/>
+
+        <!-- Botones de editar/guardar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btnEditarPerfil"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Editar"
+                style="@style/Widget.MaterialComponents.Button"
+                android:backgroundTint="#2A6FB5"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btnGuardarPerfil"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Guardar"
+                android:visibility="gone"
+                style="@style/Widget.MaterialComponents.Button"
+                android:backgroundTint="#4CAF50"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"/>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Botón cerrar sesión -->

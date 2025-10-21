@@ -56,6 +56,9 @@
         <activity
             android:name=".ResultadoActivity"
             android:exported="false" />
+        <activity
+            android:name=".HistorialActivity"
+            android:exported="false" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.medikit.fileprovider"

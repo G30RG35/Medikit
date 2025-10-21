@@ -23,5 +23,11 @@ class Home : AppCompatActivity() {
             val intent = android.content.Intent(this, CapturaActivity::class.java)
             startActivity(intent)
         }
+
+        val btnHistorial = findViewById<android.widget.Button>(R.id.btnHistorial)
+        btnHistorial.setOnClickListener {
+            val intent = android.content.Intent(this, HistorialActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

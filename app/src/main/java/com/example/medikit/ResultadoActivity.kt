@@ -37,14 +37,26 @@ class ResultadoActivity : AppCompatActivity() {
     }
 
     private fun mostrarResultado() {
-        // Mostrar imagen analizada
-        ImagenGlobal.rutaImagen?.let { ruta ->
+        var rutaImagen = ImagenGlobal.rutaImagen
+        var resultado = ImagenGlobal.resultadoIA
+
+        // Si no hay datos en memoria, cargar el último guardado
+        if (resultado == null) {
+            val reg = AnalisisStorage.leerUltimo(this)
+            if (reg != null) {
+                rutaImagen = reg.rutaImagen
+                resultado = Detector.ResultadoIA(reg.clase, reg.confianza)
+            }
+        }
+
+        // Mostrar imagen analizada si está disponible
+        rutaImagen?.let { ruta ->
             val bitmap = BitmapFactory.decodeFile(ruta)
             ivImagenAnalizada.setImageBitmap(bitmap)
         }
 
         // Mostrar resultado del análisis
-        ImagenGlobal.resultadoIA?.let { resultado ->
+        if (resultado != null) {
             tvClaseDetectada.text = resultado.clase
             tvPorcentajeConfianza.text = "${resultado.porcentaje}%"
             pbConfianza.progress = resultado.porcentaje
@@ -64,7 +76,7 @@ class ResultadoActivity : AppCompatActivity() {
             
             // Mostrar recomendaciones según el tipo de lesión
             tvRecomendaciones.text = obtenerRecomendaciones(resultado.clase, resultado.esConfiable)
-        } ?: run {
+        } else run {
             // Si no hay resultado, mostrar error
             tvClaseDetectada.text = "Error en el análisis"
             tvPorcentajeConfianza.text = "0%"

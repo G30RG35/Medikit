@@ -10,7 +10,6 @@ import android.provider.MediaStore
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
@@ -33,10 +32,12 @@ class CapturaActivity : AppCompatActivity() {
         btnTomarFoto = findViewById(R.id.btnTomarFoto)
         btnGaleria = findViewById(R.id.btnGaleria)
 
-        // El botón de captura ahora abre un selector para elegir cámara o galería
-        btnTomarFoto.isEnabled = true
-        btnTomarFoto.setOnClickListener { mostrarSelectorFuente() }
+        // Botón de tomar foto va directo a la cámara
+        btnTomarFoto.setOnClickListener {
+            checkCameraPermissionAndOpenCamera()
+        }
 
+        // Botón de galería va directo a seleccionar imagen
         btnGaleria.setOnClickListener {
             abrirGaleria()
         }
@@ -84,26 +85,6 @@ class CapturaActivity : AppCompatActivity() {
         } else {
             Log.e("CapturaActivity", "No se encontró app de cámara")
         }
-    }
-
-    private fun mostrarSelectorFuente() {
-        val dialog = BottomSheetDialog(this)
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_fuente_imagen, null)
-        dialog.setContentView(view)
-
-        val btnCamara = view.findViewById<Button>(R.id.btnSheetCamera)
-        val btnGaleria = view.findViewById<Button>(R.id.btnSheetGallery)
-
-        btnCamara.setOnClickListener {
-            dialog.dismiss()
-            checkCameraPermissionAndOpenCamera()
-        }
-        btnGaleria.setOnClickListener {
-            dialog.dismiss()
-            abrirGaleria()
-        }
-
-        dialog.show()
     }
 
     private fun abrirGaleria() {
