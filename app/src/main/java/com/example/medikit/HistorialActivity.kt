@@ -20,8 +20,9 @@ class HistorialActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_historial)
 
-        val rv = findViewById<RecyclerView>(R.id.rvHistorial)
+    val rv = findViewById<RecyclerView>(R.id.rvHistorial)
         val emptyState = findViewById<View>(R.id.emptyState)
+    val tvCount = findViewById<TextView>(R.id.tvHistorialCount)
         val btnVolver = findViewById<View>(R.id.btnVolver)
         val btnEmptyCaptura = findViewById<View>(R.id.btnEmptyCaptura)
         val btnEmptyHome = findViewById<View>(R.id.btnEmptyHome)
@@ -30,6 +31,8 @@ class HistorialActivity : AppCompatActivity() {
             .leerTodos(this)
             .sortedByDescending { it.timestamp }
             .toMutableList()
+
+        val tvEmpty = findViewById<TextView>(R.id.tvEmpty)
 
         fun actualizarVistas() {
             if (registros.isEmpty()) {
@@ -41,17 +44,7 @@ class HistorialActivity : AppCompatActivity() {
             }
         }
 
-        rv.layoutManager = LinearLayoutManager(this)
-        val adapter = HistorialAdapter(registros) { registro ->
-            ImagenGlobal.rutaImagen = registro.rutaImagen
-            ImagenGlobal.resultadoIA = Detector.ResultadoIA(registro.clase, registro.confianza)
-            startActivity(Intent(this, ResultadoActivity::class.java))
-        }
-        rv.adapter = adapter
-
-        actualizarVistas()
-
-        // Botones de navegación
+        // Botones de navegación (siempre deben estar activos)
         btnVolver.setOnClickListener { finish() }
         btnEmptyCaptura.setOnClickListener {
             startActivity(Intent(this, CapturaActivity::class.java))
@@ -61,6 +54,31 @@ class HistorialActivity : AppCompatActivity() {
             startActivity(Intent(this, Home::class.java))
             finish()
         }
+
+        // Validación: si no hay registros, mostrar mensaje claro y salir de la configuración del RecyclerView
+        if (registros.isEmpty()) {
+            tvEmpty.text = "No se tiene historial"
+            // Ocultar las acciones del empty-state y mostrar solo el mensaje
+            btnEmptyCaptura.visibility = View.GONE
+            btnEmptyHome.visibility = View.GONE
+            actualizarVistas()
+            return
+        }
+
+        rv.layoutManager = LinearLayoutManager(this)
+        // Mejora: indicar si el tamaño del RecyclerView es fijo (ayuda en rendimiento)
+        rv.setHasFixedSize(false)
+        val adapter = HistorialAdapter(registros) { registro ->
+            ImagenGlobal.rutaImagen = registro.rutaImagen
+            ImagenGlobal.resultadoIA = Detector.ResultadoIA(registro.clase, registro.confianza)
+            startActivity(Intent(this, ResultadoActivity::class.java))
+        }
+    rv.adapter = adapter
+
+    // Mostrar contador de registros para depuración/UX
+    tvCount.text = "(${registros.size} registros)"
+
+    actualizarVistas()
 
         // Swipe para eliminar con confirmación
         val swipeCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {

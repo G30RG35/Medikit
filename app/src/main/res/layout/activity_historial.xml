@@ -35,6 +35,17 @@
             android:textStyle="bold"
             android:textColor="@android:color/white"/>
 
+        <!-- Contador de registros para depuración/visibilidad -->
+        <TextView
+            android:id="@+id/tvHistorialCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(0 registros)"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"/>
+
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -60,10 +71,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Aún no tienes análisis guardados"
-            android:textColor="@android:color/white"
-            android:textSize="14sp"
+            android:textColor="#263238"
+            android:textSize="16sp"
             android:gravity="center"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            android:padding="8dp"
+            android:textStyle="bold"/>
 
         <Button
             android:id="@+id/btnEmptyCaptura"
